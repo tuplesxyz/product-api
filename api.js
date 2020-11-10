@@ -1,4 +1,4 @@
-const { list, get } = require('./products');
+const { list, get, create, edit, remove } = require('./products');
 const autoCatch = require('./lib/auto-catch');
 
 async function listProducts(req, res) {
@@ -27,15 +27,18 @@ async function getProduct(req, res, next) {
 
 async function createProduct(req, res, next) {
     console.log(`request body:`, req.body)
-    res.json(req.body)
+    const product = await create(req.body);
+    res.json(product)
 }
 
 async function editProduct(req, res, next) {
-    // console.log(req.body)
-    res.json(req.body)
+    const change = req.body
+    const product = await edit(req.params.id, change)
+    res.json(product)
 }
 
 async function deleteProduct(req, res, next) {
+    await remove(req.params.id)
     res.json({ success: true })
 }
 

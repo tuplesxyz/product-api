@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/tuplesxyz/product-api#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "cuid": "^2.1.8",
+    "express": "^4.17.1",
+    "mongoose": "^5.10.13",
+    "validator": "^13.1.17"
   }
 }
