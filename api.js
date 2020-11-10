@@ -25,7 +25,24 @@ async function getProduct(req, res, next) {
     res.json(product)
 }
 
+async function createProduct(req, res, next) {
+    console.log(`request body:`, req.body)
+    res.json(req.body)
+}
+
+async function editProduct(req, res, next) {
+    // console.log(req.body)
+    res.json(req.body)
+}
+
+async function deleteProduct(req, res, next) {
+    res.json({ success: true })
+}
+
 module.exports = autoCatch({
     listProducts,
-    getProduct
+    getProduct,
+    createProduct,
+    editProduct,
+    deleteProduct
 })
