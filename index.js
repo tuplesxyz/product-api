@@ -5,7 +5,9 @@ const {
     getProduct,
     createProduct,
     deleteProduct,
-    editProduct
+    editProduct,
+    listOrders,
+    createOrder
 } = require('./api');
 const { cors, notFound, handleError } = require('./middleware');
 const port = process.env.PORT || 1337;
@@ -20,6 +22,9 @@ app.get('/products/:id', getProduct);
 app.post('/products', createProduct)
 app.put('/products/:id', editProduct)
 app.delete('/products/:id', deleteProduct)
+
+app.get('/orders', listOrders)
+app.post('/orders', createOrder)
 
 app.use(handleError)
 app.use(notFound)
