@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser')
 const {
     authenticate,
     login,
-    ensureAdmin
+    ensureUser
 } = require('./auth')
 const {
     listProducts,
@@ -14,7 +14,8 @@ const {
     deleteProduct,
     editProduct,
     listOrders,
-    createOrder
+    createOrder,
+    createUser
 } = require('./api');
 
 const { cors, notFound, handleError, handleValidationError } = require('./middleware');
@@ -27,17 +28,19 @@ app.use(cors);
 app.use(json());
 app.use(cookieParser());
 
+app.post('/users', createUser)
+
 app.post('/login', authenticate, login)
 
 app.get('/products', listProducts);
 app.get('/products/:id', getProduct);
 
-app.post('/products', ensureAdmin, createProduct)
-app.put('/products/:id', ensureAdmin, editProduct)
-app.delete('/products/:id', ensureAdmin, deleteProduct)
+app.post('/products', ensureUser, createProduct)
+app.put('/products/:id', ensureUser, editProduct)
+app.delete('/products/:id', ensureUser, deleteProduct)
 
-app.get('/orders', ensureAdmin, listOrders)
-app.post('/orders', ensureAdmin, createOrder)
+app.get('/orders', ensureUser, listOrders)
+app.post('/orders', ensureUser, createOrder)
 
 app.use(handleValidationError)
 app.use(handleError)

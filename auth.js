@@ -17,10 +17,16 @@ async function login(req, res, next) {
     res.json({ success: true, token: token })
 }
 
-async function ensureAdmin(req, res, next) {
+async function ensureUser(req, res, next) {
     const jwtString = req.headers.authorization || req.cookies.jwt
     const payload = await verify(jwtString)
-    if (payload.username === 'admin') return next()
+
+    if (payload.username) {
+        req.user = payload
+        if (req.user.username === 'admin') req.isAdmin = true
+        return next()
+    }
+
     const err = new Error('Unauthorized')
     err.statusCode = 401
     next(err)
@@ -42,12 +48,17 @@ async function verify (jwtString = '') {
     }
 }
 
-
-
 function adminStrategy() {
-        return new Strategy(function (username, password, cb) {
+    return new Strategy(async function (username, password, cb) {
         const isAdmin = username === 'admin' && password === adminPassword
         if (isAdmin) return cb(null, { username: 'admin' })
+        try {
+            const user = await Users.get(username)
+            if (!user) return cb(null, false)
+
+            const isUser = await bcrypt.compare(password, user.password)
+            if (isUser) return cb(null, { username: user.username })
+        } catch (err) { }
 
         cb(null, false)
     })
@@ -55,6 +66,6 @@ function adminStrategy() {
 
 module.exports = {
     authenticate,
-    login,
-    ensureAdmin
+    login: autoCatch(login),
+    ensureUser: autoCatch(ensureUser)
 }
