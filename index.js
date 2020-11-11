@@ -1,7 +1,8 @@
 const express = require('express');
 const { json } = require('body-parser')
+const cookieParser = require('cookie-parser')
+
 const {
-    setMiddleware,
     authenticate,
     login,
     ensureAdmin
@@ -25,8 +26,6 @@ const app = express();
 app.use(cors);
 app.use(json());
 app.use(cookieParser());
-
-setMiddleware(app)
 
 app.post('/login', authenticate, login)
 

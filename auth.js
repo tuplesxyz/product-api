@@ -1,39 +1,48 @@
+const jwt = require('jsonwebtoken')
 const passport = require('passport')
 const Strategy = require('passport-local').Strategy
-const cookieParser = require('cookie-parser')
-const expressSession = require('express-session')
 
-const sessionSecret = process.env.SESSION_SECRET || 'mark it zero'
+const autoCatch = require('./lib/auto-catch')
+
+const jwtSecret = process.env.JWT_SECRET || 'mark it zero'
 const adminPassword = process.env.ADMIN_PASSWORD || 'iamthewalrus'
+const jwtOpts = { algorithm: 'HS256', expiresIn: '30d' }
 
 passport.use(adminStrategy())
-passport.serializeUser((user, cb) => cb(null, user))
-passport.deserializeUser((user, cb) => cb(null, user))
-const authenticate = passport.authenticate('local');
+const authenticate = passport.authenticate('local', { session: false });
 
-function setMiddleware(app) {
-    app.use(session())
-    app.use(passport.initialize())
-    app.use(passport.session())
+async function login(req, res, next) {
+    const token = await sign({ username: req.user.username })
+    res.cookie('jwt', token, { httpOnly: true })
+    res.json({ success: true, token: token })
 }
 
-function login(req, res, next) {
-    res.json({ success: true })
+async function ensureAdmin(req, res, next) {
+    const jwtString = req.headers.authorization || req.cookies.jwt
+    const payload = await verify(jwtString)
+    if (payload.username === 'admin') return next()
+    const err = new Error('Unauthorized')
+    err.statusCode = 401
+    next(err)
 }
 
-function ensureAdmin(req, res, next) {
-        const isAdmin = req.user && req.user.username === 'admin'
-        if (isAdmin) return next()
-        const err = new Error('Unauthorized')
+async function sign(payload) {
+    const token = await jwt.sign(payload, jwtSecret, jwtOpts)
+    return token
+}
+
+async function verify (jwtString = '') {
+    jwtString = jwtString.replace(/^Bearer /i, '')
+    try {
+        const payload = await jwt.verify(jwtString, jwtSecret)
+        return payload
+    } catch (err) {
         err.statusCode = 401
-        next(err)
+        throw err
+    }
 }
 
-function session() {
-    return expressSession({
-    secret: sessionSecret, resave: false, saveUninitialized: false
-    })
-}
+
 
 function adminStrategy() {
         return new Strategy(function (username, password, cb) {
@@ -45,7 +54,6 @@ function adminStrategy() {
 }
 
 module.exports = {
-    setMiddleware,
     authenticate,
     login,
     ensureAdmin
