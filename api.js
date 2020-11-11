@@ -1,4 +1,4 @@
-const { list, get, create, edit, remove } = require('./products');
+const { list, get, create, edit, remove } = require('./models/products');
 const autoCatch = require('./lib/auto-catch');
 
 async function listProducts(req, res) {
