@@ -1,7 +1,7 @@
 const cuid = require('cuid')
 const bcrypt = require('bcrypt')
 const { isEmail, isAlphanumeric } = require('validator')
-const db = require('../db')
+const db = require('./db')
 
 const SALT_ROUNDS = 10
 

@@ -1,4 +1,4 @@
-const db = require('../db');
+const db = require('../models/db');
 const Products = require('../models/products');
 const products = require('../products.json');
 

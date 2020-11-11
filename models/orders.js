@@ -1,6 +1,6 @@
 const cuid = require('cuid')
 const { isEmail } = require('validator')
-const db = require('../db')
+const db = require('./db')
 
 function emailSchema(opts = {}) {
     const { required } = opts
